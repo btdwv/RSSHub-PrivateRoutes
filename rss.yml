@@ -1,0 +1,46 @@
+version: "3"
+
+services:
+  freshrss:
+    image: docker.m.daocloud.io/linuxserver/freshrss
+    container_name: freshrss
+    restart: always
+    environment:
+      - PUID=1000
+      - PGID=100
+      - TZ=Asia/Shanghai
+    volumes:
+      - /share/DockerConfig/rss/freshrss:/config
+    ports:
+      - 8282:80
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
+  rsshub:
+    image: docker.m.daocloud.io/diygod/rsshub:chromium-bundled
+    restart: always
+    ports:
+      - 1200:80
+    env_file:
+      - /share/DockerConfig/rss/rsshub/rsshub.env
+    environment:
+      PORT: 80
+      NODE_ENV: production
+      CACHE_TYPE: memory
+      REDIS_URL: redis://redis:6379/
+      ALLOW_USER_SUPPLY_UNSAFE_DOMAIN: true
+      PUID: 1000
+      PGID: 100
+      suwayomi_internal_address: http://Suwayomi:4567 #rsshub怎样访问suwayomi-server
+      suwayomi_external_address: http://192.168.50.50:14567 #用户怎样访问suwayomi-server
+    volumes:
+      - /share/DockerConfig/rss/rsshub:/config
+    command:
+      - sh
+      - -c
+      - |
+        node /config/addPrivateRoutes.js
+        npm run start
+    extra_hosts:
+      - host.docker.internal:host-gateway
+
