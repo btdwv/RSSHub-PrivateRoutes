@@ -13,6 +13,8 @@
 启动时先运行addPrivateRoutes.js，将私有路由的配置合并进去，再启动rsshub
 
 ```
+    env_file:
+      - /share/DockerConfig/rss/rsshub/rsshub.env
     volumes:
       - /share/DockerConfig/rss/rsshub:/config  
     command:
@@ -30,3 +32,4 @@
 suwayomi-server/manga.ts     |  给suwayomi生成rss
 copymanga/author.ts          |  给拷贝漫画的作者页面生成rss，方便检查作者有没有新作品
 coymanga/comic_puppeteer.ts  |  通过puppeteer解析拷贝漫画的章节目录页面，生成rss
+zaimanhua/comic.ts           |  再漫画的rss脚本(注意: 需要在环境变量文件rsshub.env设置用户名、密码)
