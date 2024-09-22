@@ -45,18 +45,19 @@ async function handler(ctx) {
     };
 
     const fetchComicDetail = async () => {
-        if (token === "") {
-            return null;
+        const header = {};
+        if (token !== "") {
+            header.authorization = `Bearer ${token}`;
         }
-
         const {  data } = await got({
             method: 'get',
             url: comicUrl,
-            headers: {
-                authorization: `Bearer ${token}`
-            }
+            headers: header
         });
 
+        if (isGetComicDetailSuccess(data) === false) {
+            return null;
+        }
         return data;
     };
 
@@ -126,7 +127,7 @@ async function handler(ctx) {
         process.env.ZAIMANHUA_TOKEN = token;// 把能用的Token设置到环境变量
 
         // 获取了新的Token，重试一次
-        cache.set(comicUrl, "", 300);// 清空缓存，便于立刻重试
+        cache.set(comicUrl, "", 0);// 清空缓存
         comicDetail = await cache.tryGet(comicUrl, fetchComicDetail, config.cache.routeExpire, false);
         if (await isGetComicDetailSuccess(comicDetail) === false) {
             return null;
