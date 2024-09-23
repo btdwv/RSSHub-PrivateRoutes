@@ -59,7 +59,11 @@ async function handler(ctx) {
       const listItem = {};
       listItem.link = strBaseUrl + bookUrls[i].attribs.href.replace(strProxy, "").replace(strBaseUrl, "");
       listItem.title = bookNames[i].attribs.title;
-      listItem.description = `<img src=${covers[i].attribs.src.replace(strProxy, "")}></img>`.trim();
+      if (covers[i].attribs.src !== undefined) {
+        listItem.description = `<img src=${covers[i].attribs.src.replace(strProxy, "")}></img>`.trim();
+      } else if (covers[i].attribs['data-src'] !== undefined) {
+        listItem.description = `<img src=${covers[i].attribs['data-src'].replace(strProxy, "")}></img>`.trim();
+      }
       listItem.author = authorName;
       items.push(listItem);
     }
