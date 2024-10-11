@@ -2,7 +2,7 @@
 介绍如何给RSSHub添加私有路由
 
 ## 开发
-参考RSSHub的介绍文档进行开发，写好脚本并编译
+参考RSSHub的介绍文档进行开发，写好脚本并构建
 
 ## 复制配置
 打开/app/assets/build/routes.json，将自己添加的脚本配置找出来，单独复制到config/privateRoutes.json中  
