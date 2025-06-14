@@ -22,7 +22,7 @@ services:
     ports:
       - 1200:80
     env_file:
-      - /share/DockerConfig/rss/rsshub/rsshub.env
+      - rsshub.env
     environment:
       PORT: 80
       NODE_ENV: production
@@ -31,8 +31,6 @@ services:
       ALLOW_USER_SUPPLY_UNSAFE_DOMAIN: true
       PUID: 1000
       PGID: 100
-      suwayomi_internal_address: http://Suwayomi:4567 #rsshub怎样访问suwayomi-server
-      suwayomi_external_address: http://192.168.50.50:14567 #用户怎样访问suwayomi-server
     volumes:
       - /share/DockerConfig/rss/rsshub:/config
     command:

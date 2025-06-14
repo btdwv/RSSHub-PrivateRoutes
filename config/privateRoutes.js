@@ -19,7 +19,7 @@
         "name": "作者作品",
         "maintainers": ["btdwv"],
         "location": "author.ts",
-        "module": "() => import('@/routes/copymanga/author.ts')"
+        "module": () => import('@/routes/copymanga/author.ts')
       },
       "/comic/:id/:chapterCnt?": {
         "path": "/comic/:id/:chapterCnt?",
@@ -40,7 +40,7 @@
         "name": "漫画更新",
         "maintainers": ["btdwv", "marvolo666", "yan12125"],
         "location": "comic.ts",
-        "module": "() => import('@/routes/copymanga/comic.ts')"
+        "module": () => import('@/routes/copymanga/comic.ts')
       }
     },
     "name": "拷贝漫画",
@@ -67,7 +67,7 @@
         "name": "漫画更新",
         "maintainers": ["btdwv"],
         "location": "manga.ts",
-        "module": "() => import('@/routes/suwayomi-server/manga.ts')"
+        "module": () => import('@/routes/suwayomi-server/manga.ts')
       }
     },
     "name": "Suwayomi-Server",
@@ -94,7 +94,7 @@
         "name": "漫画更新",
         "maintainers": ["btdwv"],
         "location": "comic.ts",
-        "module": "() => import('@/routes/zaimanhua/comic.ts')"
+        "module": () => import('@/routes/zaimanhua/comic.ts')
       }
     },
     "name": "再漫画",

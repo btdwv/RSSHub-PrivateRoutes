@@ -28,17 +28,17 @@ async function handler(ctx) {
 
   const strBaseUrl = "https://mangacopy.com";
   const strPageUrl = `${strBaseUrl}/author/${id}/comics`;
-  
+
   const strProxy = "https://xxxxx.username.workers.dev/";
   const strProxyPageUrl = `${strProxy}${strPageUrl}`;//通过cloudflare搭建的代理 https://github.com/gaboolic/cloudflare-reverse-proxy  https://github.com/1234567Yang/cf-proxy-ex
-  
+
   const fetchChaptorxData = async () => {
     const browser = await puppeteer.launch({
       headless: true,
       args: ["--no-sandbox"],
     });
     const page = await browser.newPage();
-    await page.goto(strPageUrl);
+    await page.goto(strProxyPageUrl);
     const html = await page.evaluate(
       () => document.querySelector("body").innerHTML
     );
@@ -71,7 +71,7 @@ async function handler(ctx) {
   };
 
   const chapterArray = await cache.tryGet(
-    strPageUrl,
+    strProxyPageUrl,
     fetchChaptorxData,
     config.cache.routeExpire,
     false

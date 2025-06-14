@@ -3,6 +3,7 @@ import cache from '@/utils/cache';
 import got from '@/utils/got';
 import dayjs from 'dayjs';
 import { config } from '@/config';
+import ConfigNotFoundError from '@/errors/types/config-not-found';
 
 export const route: Route = {
     path: '/manga/:id',
@@ -23,6 +24,10 @@ export const route: Route = {
 };
 
 async function handler(ctx) {
+    if (!process.env.SUWAYOMI_INTERNAL_ADDRESS || !process.env.SUWAYOMI_EXTERNAL_ADDRESS) {
+        throw new ConfigNotFoundError('not found environment variable [SUWAYOMI_INTERNAL_ADDRESS] or [SUWAYOMI_EXTERNAL_ADDRESS]');
+    }
+    
     const id = ctx.req.param('id');
     const site = process.env.SUWAYOMI_INTERNAL_ADDRESS || "";//rsshub怎样访问suwayomi-server，填写rsshub能访问到的地址 如: http://Suwayomi:4567
     const pageAddress = process.env.SUWAYOMI_EXTERNAL_ADDRESS || "";//用户怎样访问suwayomi-server，填写浏览器中看到的地址 如: http://192.168.50.50:14567
