@@ -109,21 +109,35 @@ function parseRoutes(content) {
 function mergeRoutes(routes, privateRoutes) {
     // 遍历私有路由
     for (const [key, value] of Object.entries(privateRoutes)) {
-        if (routes[key]) {
-            // 如果路由已存在，合并 routes 对象
-            if (routes[key].routes && value.routes) {
-                routes[key].routes = { ...routes[key].routes, ...value.routes };
-            }
-            // 更新其他属性
-            routes[key] = { ...routes[key], ...value };
-        } else {
-            // 如果路由不存在，直接添加
+        if (!routes[key]) {
             routes[key] = value;
+        } else {
+            // 遍历routes
+            for (const [routesKey, routesValue] of Object.entries(value.routes)) {
+                if (!routes[key].routes[routesKey]) {
+                    // 如果原路由里不存在，就直接赋值
+                    routes[key].routes[routesKey] = routesValue;
+                } else {
+                    // 如果原路由里存在，就合并
+                    routes[key].routes[routesKey] = { ...routes[key].routes[routesKey], ...routesValue };
+                }
+            }
+            // 遍历其他属性
+            for (const [routesKey, routesValue] of Object.entries(value)) {
+                if (routesKey === 'routes') {
+                    continue;
+                }
+                if (routes[key][routesKey]) {
+                    // 其他属性，如： name、lang、url就不覆盖了
+                    // routes[key][routesKey] = { ...routes[key][routesKey], ...routesValue };
+                } else {
+                    routes[key][routesKey] = routesValue;
+                }
+            }
         }
     }
     return routes;
 }
-
 // 写入文件
 function writeFile(filePath, content) {
     try {

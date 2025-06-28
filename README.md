@@ -31,5 +31,6 @@
 -|-
 suwayomi-server/manga.ts     |  给suwayomi生成rss
 copymanga/author.ts          |  给拷贝漫画的作者页面生成rss，方便检查作者有没有新作品
-coymanga/comic_puppeteer.ts  |  通过puppeteer解析拷贝漫画的章节目录页面，生成rss
+coymanga/comic2.ts           |  通过puppeteer解析拷贝漫画的章节目录页面，生成rss
 zaimanhua/comic.ts           |  再漫画的rss脚本(注意: 需要在环境变量文件rsshub.env设置用户名、密码)
+manhuagui/comic2.ts          |  可以通过网页代理访问漫画柜(注意: 如果要通过网页代理访问，需要在环境变量文件rsshub.env设置地址、密码)

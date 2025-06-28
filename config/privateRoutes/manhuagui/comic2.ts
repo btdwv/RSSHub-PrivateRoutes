@@ -44,9 +44,9 @@ const getChapters = ($) => {
 };
 
 export const route: Route = {
-    path: ['/comic/:id/:chapterCnt?', '/:domain?/comic/:id/:chapterCnt?'],
+    path: ['/comic2/:id/:chapterCnt?', '/:domain?/comic2/:id/:chapterCnt?'],
     categories: ['anime'],
-    example: '/manhuagui/comic/22942/5',
+    example: '/manhuagui/comic2/22942/5',
     parameters: { id: '漫画ID', chapterCnt: '返回章节的数量，默认为0，返回所有章节' },
     features: {
         requireConfig: false,
@@ -59,7 +59,7 @@ export const route: Route = {
     radar: [
         {
             source: ['www.mhgui.com/comic/:id/'],
-            target: '/comic/:id',
+            target: '/comic2/:id',
         },
     ],
     name: '漫画更新',
@@ -68,8 +68,11 @@ export const route: Route = {
 };
 
 async function handler(ctx) {
-    //if (!process.env.CLOUDFLARE_PROXY) {
-    //    throw new ConfigNotFoundError('not found CLOUDFLARE_PROXY');
+    //if (!process.env.CLOUDFLARE_PROXY_ADDR) {
+    //    throw new ConfigNotFoundError('not found CLOUDFLARE_PROXY_ADDR');
+    //}
+    //if (!process.env.CLOUDFLARE_PROXY_PWD) {
+    //    throw new ConfigNotFoundError('not found CLOUDFLARE_PROXY_PWD');
     //}
 
     const { id, domain } = ctx.req.param();
@@ -81,11 +84,22 @@ async function handler(ctx) {
         baseUrl = 'https://www.manhuagui.com';
     }
     const baseUrl2 = baseUrl;
-    const strProxy = process.env.CLOUDFLARE_PROXY || "";
-    baseUrl = strProxy + baseUrl;
+    const strProxyAddr = process.env.CLOUDFLARE_PROXY_ADDR || "";
+    let strProxyCookie = process.env.CLOUDFLARE_PROXY_PWD || "";
+    if (strProxyCookie !== "") {
+        const strProxyDomain = strProxyAddr.replace('https://', '').replace('/', '');
+        strProxyCookie = `__PROXY_PWD__=${strProxyCookie}; path=/; domain=${strProxyDomain}`;
+    }
+    
+    baseUrl = strProxyAddr + baseUrl;
 
     const chapterCnt = Number(ctx.req.param('chapterCnt') || 0);
-    const { data } = await got(`${baseUrl}/comic/${id}/`);
+    const { data } = await got(`${baseUrl}/comic/${id}/`, {
+        headers: {
+            'Cookie': strProxyCookie
+        }
+    });
+    
     const $ = load(data);
 
     if ($('#__VIEWSTATE').length > 0) {
@@ -98,7 +112,7 @@ async function handler(ctx) {
 
     const bookTitle = $('.book-title > h1').text();
     const bookIntro = $('#intro-all').text();
-    const coverImgSrc = $('.book-cover img').attr('src').replace(strProxy, "");
+    const coverImgSrc = $('.book-cover img').attr('src').replace(strProxyAddr, "");
     // 对最新更新的章节增加了pubDate
     const reg = /最近[于於].+更新至/;
     // 处理已下架的漫画
@@ -120,7 +134,7 @@ async function handler(ctx) {
         $.newChapterCnt = 0;
         const chapters = getChapters($);
         const genResult = (chapter) => ({
-            link: chapter.link.replace(strProxy, ""),
+            link: chapter.link.replace(strProxyAddr, ""),
             title: chapter.title,
             pubDate: chapter.pub_date,
             category: chapter.category,

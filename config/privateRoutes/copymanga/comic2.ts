@@ -5,20 +5,20 @@ import { config } from "@/config";
 import puppeteer from "puppeteer";
 
 export const route: Route = {
-  path: "/comic/:id/:chapterCnt?",
+  path: "/comic2/:id/:chapterCnt?",
   categories: ["anime"],
-  example: "/copymanga/comic/dianjuren/5",
+  example: "/copymanga/comic2/dianjuren/5",
   parameters: { id: "漫画ID", chapterCnt: "返回章节的数量，默认为 `10`" },
   features: {
     requireConfig: false,
-    requirePuppeteer: false,
+    requirePuppeteer: true,
     antiCrawler: false,
     supportBT: false,
     supportPodcast: false,
     supportScihub: false,
   },
   name: "漫画更新",
-  maintainers: ["btdwv", "marvolo666", "yan12125"],
+  maintainers: ["btdwv"],
   handler,
 };
 
@@ -74,7 +74,7 @@ async function handler(ctx) {
     });
     const page = await browser.newPage();
     await page.goto(strPageUrl);
-    await page.waitForSelector('.table-default-box > div > div > ul', { timeout: 5000 });
+    await page.waitForSelector('.table-default-box > div > div > ul', { timeout: 10000 });
     // await new Promise(resolve => setTimeout(resolve, 3000));// 加载页面后，页面通过js动态加载章节，等待3秒再继续
     const html = await page.evaluate(() => document.querySelector("body").innerHTML);
     browser.close();

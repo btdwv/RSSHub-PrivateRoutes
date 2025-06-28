@@ -26,11 +26,12 @@ async function handler(ctx) {
   const id = ctx.req.param("id");
   let authorName = "";
 
-  const strBaseUrl = "https://mangacopy.com";
+  const strBaseUrl = "https://www.mangacopy.com";
   const strPageUrl = `${strBaseUrl}/author/${id}/comics`;
 
-  const strProxy = "https://xxxxx.username.workers.dev/";
-  const strProxyPageUrl = `${strProxy}${strPageUrl}`;//通过cloudflare搭建的代理 https://github.com/gaboolic/cloudflare-reverse-proxy  https://github.com/1234567Yang/cf-proxy-ex
+  const strProxyAddr = process.env.CLOUDFLARE_PROXY_ADDR || "";
+  const strProxyPwd = process.env.CLOUDFLARE_PROXY_PWD || "";
+  const strProxyPageUrl = `${strProxyAddr}${strPageUrl}`;//通过cloudflare搭建的代理 https://github.com/gaboolic/cloudflare-reverse-proxy  https://github.com/1234567Yang/cf-proxy-ex
 
   const fetchChaptorxData = async () => {
     const browser = await puppeteer.launch({
@@ -38,6 +39,14 @@ async function handler(ctx) {
       args: ["--no-sandbox"],
     });
     const page = await browser.newPage();
+    if (strProxyPwd !== "" && strProxyAddr !== "") {
+      await page.setCookie({
+        name: '__PROXY_PWD__',
+        value: strProxyPwd,
+        domain: strProxyAddr.replace("https://", "").replace("/", ""),
+        path: "/"
+      });
+    }
     await page.goto(strProxyPageUrl);
     const html = await page.evaluate(
       () => document.querySelector("body").innerHTML
@@ -57,12 +66,12 @@ async function handler(ctx) {
     const items = [];
     for (let i = 0; i < count; i++) {
       const listItem = {};
-      listItem.link = strBaseUrl + bookUrls[i].attribs.href.replace(strProxy, "").replace(strBaseUrl, "");
+      listItem.link = strBaseUrl + bookUrls[i].attribs.href.replace(strProxyAddr, "").replace(strBaseUrl, "");
       listItem.title = bookNames[i].attribs.title;
       if (covers[i].attribs.src !== undefined) {
-        listItem.description = `<img src=${covers[i].attribs.src.replace(strProxy, "")}></img>`.trim();
+        listItem.description = `<img src=${covers[i].attribs.src.replace(strProxyAddr, "")}></img>`.trim();
       } else if (covers[i].attribs['data-src'] !== undefined) {
-        listItem.description = `<img src=${covers[i].attribs['data-src'].replace(strProxy, "")}></img>`.trim();
+        listItem.description = `<img src=${covers[i].attribs['data-src'].replace(strProxyAddr, "")}></img>`.trim();
       }
       listItem.author = authorName;
       items.push(listItem);
